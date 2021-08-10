@@ -145,14 +145,11 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
                        num_introns=gr_start$num_introns,
                        sj=gr_start$label,
                        motif=paste0(as.vector(m_start),as.vector(m_end)))
-    print(motif)
     motif
   })
   message('rbind')
-  save(sj_motif,file=file.path(data_dir,'sj_motif.RData'))
-
   sj_motif <- do.call(rbind,sj_motif)
-
+  sj_motif <- DataFrame(sj_motif)
 
   ## transcript id + intron numbering as row names
   rownames(sj_motif) <- paste0(sj_motif$transcript_id,'.',sj_motif$num_introns)
