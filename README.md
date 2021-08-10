@@ -42,16 +42,15 @@ Output to run TAMA merge
   - prefix_collasped_filtered_summary.csv: The summary of the filtered collapsed RTD.
 
 Intermediate output in .RData object, which you can manipulate with R scripts. 
-  - HC_TES.RData
-  - HC_TSS.RData
-  - TES_summary.RData
-  - TSS_summary.RData
-  - sj_trans_filter.RData
-  - density_error_motif_filtered.RData
-  - sj_motif.RData
-  - collasped_bed.RData
-  - density_error.RData
-
+  - collasped_bed.RData: the final collapsed RTD from TAMA collapse is saved in .RData object.
+  - density_error.RData: the prefix_local_density_error file in TAMA collapse. 
+  - density_error_motif_filtered.RData: the prefix_local_density_error after finter non-canonical and error splice junctions. 
+  - sj_motif.RData: Splice junction motifs.
+  - sj_trans_filter.RData: Splice junction motifs after filter non-canonical and error splice junctions. 
+  - TSS_summary.RData: The Binomial testing statistics of TSS. 
+  - TES_summary.RData: The Binomial testing statistics of TES. 
+  - HC_TSS.RData: TSS of high confidence.
+  - HC_TES.RData: TES of high confidence.
 
 Run pipeline with R code
 ------------------------
