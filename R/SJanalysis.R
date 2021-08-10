@@ -148,7 +148,7 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
 
   ## transcript id + intron numbering as row names
   rownames(sj_motif) <- paste0(sj_motif$transcript_id,'.',sj_motif$num_introns)
-  head(sj_motif)
+  # head(sj_motif)
 
   idx <- which(strand(sj_motif)=='-')
   motif <- sj_motif[idx,'motif']
