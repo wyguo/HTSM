@@ -21,7 +21,7 @@ TSanalysis(
 
 \item{cut_at}{The \code{cut_off} is applied to "fdr" (adjustd p-value), "pval" (p-value) or "prob" (probability).}
 
-\item{TSS_region, TES_region}{An integer of enriched TSS/TES wobbling region. TSSs/TESs locate within enriched 
+\item{TSS_region, TES_region}{An integer of enriched TSS/TES wobbling region. TSSs/TESs locate within enriched
 site+/-site_region are all treated as high confident sites. Default: 50.}
 
 \item{min_read}{The minimum reads in the window around TSS/TES to support high confident sites. Default: 2.}

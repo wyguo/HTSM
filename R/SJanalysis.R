@@ -12,7 +12,7 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
   if(is.null(genome_fasta))
     stop('Please provide the genome sequence fasta file')
 
-  message('|==>   Splice Junction (SJ) analysis (ca. 5min): ',Sys.time(),'   <==|')
+  message('|==>   Splice Junction (SJ) analysis (ca. 6min): ',Sys.time(),'   <==|')
   message('Step 1: Prepare the local density error')
   #######################################################################
   ## Step 1: Prepare the local density error
@@ -213,6 +213,6 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
   message('Done: ',Sys.time())
   end.time <- Sys.time()
   time.taken <- end.time - start.time
-  message(paste('Time for analysis:',round(time.taken,3),attributes(time.taken)$units))
+  message(paste('Time for analysis:',round(time.taken,3),attributes(time.taken)$units),'\n')
 
 }
