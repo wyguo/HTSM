@@ -12,62 +12,63 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
   if(is.null(genome_fasta))
     stop('Please provide the genome sequence fasta file')
 
-  message('|==>   Splice Junction (SJ) analysis (ca. 5min): ',Sys.time(),'   <==|')
-  message('Step 1: Prepare the local density error')
-  #######################################################################
-  ## Step 1: Prepare the local density error
-  #######################################################################
-
-  ###---> read the transcript model for each read
-  file2read <- list.files(path = data_dir,
-                          pattern = '_local_density_error.txt$',
-                          full.names = T,
-                          recursive = T)
-  if(!file.exists(file2read))
-    stop('File "*_local_density_error.txt" is missing in the data directory:\n',data_dir)
-
-  ## only read column 1 and 12
-  colClasses <- rep("NULL",13)
-  colClasses[c(1,12)] <- "character"
-  density_error <- read.delim(file2read,colClasses = colClasses)
-
-  ## Filter read with "na" sj_error_simple
-  idx <- which(density_error$sj_error_simple=='na')
-  density_error <- density_error[-idx,]
-
-  ## separate sj_error_simple to multiple rows with deliminate ";"
-  density_error <- separate_rows(density_error, sj_error_simple,sep = ';')
-  density_error$num_introns <- sequence(rle(density_error$cluster_id)$length)
-
-  ###---> read transcript ids
-  file2read <- list.files(path = data_dir,
-                          pattern = '_collasped_trans_read.bed$',
-                          full.names = T,
-                          recursive = T)
-  if(!file.exists(file2read))
-    stop('File "*_collasped_trans_read.bed" is missing in the data directory:\n',data_dir)
-
-  ## only read column 4
-  colClasses <- rep("NULL",12)
-  colClasses[4] <- "character"
-
-  trans <- read.delim(file2read, header=FALSE,colClasses = colClasses)
-  trans <- as.vector(t(trans))
-
-  ## get cluster and transcript ids
-  name.idx <- gsub(';.*','',trans)
-  names(name.idx) <- gsub('.*;','',trans)
-
-  idx <- which(density_error$cluster_id %in% names(name.idx))
-  density_error <- density_error[idx,]
-
-  ## Add transcript id to density error file
-  density_error$transcript_id <- name.idx[density_error$cluster_id]
-  density_error <- DataFrame(density_error)
-
-  ## transcript id + intron numbering as row names
-  rownames(density_error) <- paste0(density_error$transcript_id,'.',density_error$num_introns)
-  save(density_error,file=file.path(data_dir,'density_error.RData'))
+  # message('|==>   Splice Junction (SJ) analysis (ca. 5min): ',Sys.time(),'   <==|')
+  # message('Step 1: Prepare the local density error')
+  # #######################################################################
+  # ## Step 1: Prepare the local density error
+  # #######################################################################
+  #
+  # ###---> read the transcript model for each read
+  # file2read <- list.files(path = data_dir,
+  #                         pattern = '_local_density_error.txt$',
+  #                         full.names = T,
+  #                         recursive = T)
+  # if(!file.exists(file2read))
+  #   stop('File "*_local_density_error.txt" is missing in the data directory:\n',data_dir)
+  #
+  # ## only read column 1 and 12
+  # colClasses <- rep("NULL",13)
+  # colClasses[c(1,12)] <- "character"
+  # density_error <- read.delim(file2read,colClasses = colClasses)
+  #
+  # ## Filter read with "na" sj_error_simple
+  # idx <- which(density_error$sj_error_simple=='na')
+  # density_error <- density_error[-idx,]
+  #
+  # ## separate sj_error_simple to multiple rows with deliminate ";"
+  # density_error <- separate_rows(density_error, sj_error_simple,sep = ';')
+  # density_error$num_introns <- sequence(rle(density_error$cluster_id)$length)
+  #
+  # ###---> read transcript ids
+  # file2read <- list.files(path = data_dir,
+  #                         pattern = '_collasped_trans_read.bed$',
+  #                         full.names = T,
+  #                         recursive = T)
+  # if(!file.exists(file2read))
+  #   stop('File "*_collasped_trans_read.bed" is missing in the data directory:\n',data_dir)
+  #
+  # ## only read column 4
+  # colClasses <- rep("NULL",12)
+  # colClasses[4] <- "character"
+  #
+  # trans <- read.delim(file2read, header=FALSE,colClasses = colClasses)
+  # trans <- as.vector(t(trans))
+  #
+  # ## get cluster and transcript ids
+  # name.idx <- gsub(';.*','',trans)
+  # names(name.idx) <- gsub('.*;','',trans)
+  #
+  # idx <- which(density_error$cluster_id %in% names(name.idx))
+  # density_error <- density_error[idx,]
+  #
+  # ## Add transcript id to density error file
+  # density_error$transcript_id <- name.idx[density_error$cluster_id]
+  # density_error <- DataFrame(density_error)
+  #
+  # ## transcript id + intron numbering as row names
+  # rownames(density_error) <- paste0(density_error$transcript_id,'.',density_error$num_introns)
+  # save(density_error,file=file.path(data_dir,'density_error.RData'))
+  load(file.path(data_dir,'density_error.RData'))
 
   message('Step 2: Extract splice junction motifs')
   #######################################################################
@@ -75,17 +76,20 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
   #######################################################################
 
   # This is a bed12 format file containing the final collapsed version of your transcriptome.
-  file2read <- list.files(path = data_dir,
-                          pattern = '_collasped.bed$',
-                          full.names = T,
-                          recursive = T)
-  if(!file.exists(file2read))
-    stop('File "*_collasped.bed" is missing in the data directory:\n',data_dir)
 
-  collasped_bed <- import(file2read)
-  collasped_bed$gene_id <- gsub(';.*','',collasped_bed$name)
-  collasped_bed$transcript_id <- gsub('.*;','',collasped_bed$name)
-  save(collasped_bed,file=file.path(data_dir,'collasped_bed.RData'))
+
+  # file2read <- list.files(path = data_dir,
+  #                         pattern = '_collasped.bed$',
+  #                         full.names = T,
+  #                         recursive = T)
+  # if(!file.exists(file2read))
+  #   stop('File "*_collasped.bed" is missing in the data directory:\n',data_dir)
+  #
+  # collasped_bed <- import(file2read)
+  # collasped_bed$gene_id <- gsub(';.*','',collasped_bed$name)
+  # collasped_bed$transcript_id <- gsub('.*;','',collasped_bed$name)
+  # save(collasped_bed,file=file.path(data_dir,'collasped_bed.RData'))
+  load(file.path(data_dir,'collasped_bed.RData'))
 
   ## get exons of the transcriptome
   exons <- unlist(blocks(collasped_bed))
@@ -115,6 +119,8 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
   dna <- dna[chr]
 
   ## extract sj motifs
+  message("Check: extract sj motifs")
+  print(chr[1:10])
   sj_motif <- lapply(chr, function(x){
     # message(x)
     gr_start <- sj_start[[x]]
