@@ -148,7 +148,7 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
     motif
   })
   message('rbind')
-  sj_motif <- do.call(base::rbind,sj_motif)
+  sj_motif <- do.call(S4Vectors::rbind,sj_motif)
   # sj_motif <- DataFrame(sj_motif)
 
   ## transcript id + intron numbering as row names
