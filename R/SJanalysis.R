@@ -122,7 +122,7 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
   message("Check: extract sj motifs")
   print(chr[1:10])
   sj_motif <- lapply(chr, function(x){
-    # message(x)
+    message(x)
     gr_start <- sj_start[[x]]
     if(is.null(gr_start))
       return(NULL)
