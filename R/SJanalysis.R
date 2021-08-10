@@ -139,7 +139,7 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
     m_end <- extractAt(x = dna[[x]],at = gr_end@ranges)
 
     ## put them into a data frame, add information of gene id, transcript id, strand
-    motif <- DataFrame(gene_id=gr_start$gene_id,
+    motif <- data.frame(gene_id=gr_start$gene_id,
                        transcript_id=gr_start$transcript_id,
                        strand=strand(gr_start),
                        num_introns=gr_start$num_introns,
@@ -149,7 +149,10 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10){
     motif
   })
   message('rbind')
+  save(sj_motif,file=file.path(data_dir,'sj_motif.RData'))
+
   sj_motif <- do.call(rbind,sj_motif)
+
 
   ## transcript id + intron numbering as row names
   rownames(sj_motif) <- paste0(sj_motif$transcript_id,'.',sj_motif$num_introns)
