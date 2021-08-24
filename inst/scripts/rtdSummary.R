@@ -5,16 +5,6 @@ suppressMessages(library("GenomicRanges"))
 suppressMessages(library("rtracklayer"))
 suppressMessages(library("RTDBox"))
 
-sourceDir <- function(path, trace = TRUE, ...) {
-  for (nm in list.files(path, pattern = '*.R')) {
-    #if(trace) cat(nm,":")
-    source(file.path(path, nm), ...)
-    #if(trace) cat("/n")
-  }
-}
-sourceDir(path = 'R',encoding = 'UTF-8')
-sourceDir(path = '/home/wguo/scratch/pantrans_isoseq/code/R',encoding = 'UTF-8')
-
 option_list <- list(
   make_option(opt_str = c('-i','--input'),help = 'Input bed or gtf file'),
   make_option(opt_str = c('-f','--format'),help = 'Format of the input file. Options: "gtf" and "bed"'),
