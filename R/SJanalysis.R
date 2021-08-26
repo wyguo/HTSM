@@ -171,6 +171,7 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10,ref_rtd=NUL
   
   ## ref_rtd
   if(!is.null(ref_rtd)){
+    message('  Reading SJ database...')
     gtf_db <- import(ref_rtd)
     idx <- ifelse('type' %in% colnames(mcols(gtf_db)),'type','feature')
     gtf_db <- gtf_db[mcols(gtf_db)[,idx]=='exon',]
