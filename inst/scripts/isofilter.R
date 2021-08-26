@@ -6,15 +6,6 @@ suppressMessages(library("Biostrings"))
 suppressMessages(library("tidyr"))
 suppressMessages(library("RTDBox"))
 
-# sourceDir <- function(path, trace = TRUE, ...) {
-#   for (nm in list.files(path, pattern = '*.R')) {
-#     #if(trace) cat(nm,":")
-#     source(file.path(path, nm), ...)
-#     #if(trace) cat("/n")
-#   }
-# }
-# # sourceDir(path = 'R',encoding = 'UTF-8')
-# sourceDir(path = '/home/wguo/scratch/pantrans_isoseq/code/R',encoding = 'UTF-8')
 options(stringsAsFactors = F,scipen = 99)
 
 # data_dir <- 'data/isoseq'
@@ -39,7 +30,7 @@ option_list <- list(
               help = 'Cut-off of "prob", "pval" or "fdr" for TSS and TES enrichment. Default: 0.05'),
   make_option(opt_str = c('-a','--cutat'),type = 'character',default = 'fdr',
               help = 'Statistics to determine enriched TSS/TES. Options are "fdr" for BH adjusted 
-                p-value, "pval" for p-value and "prob" for probablity.'),
+                p-value, "pval" for p-value and "prob" for probablity. Default: fdr.'),
   make_option(opt_str = c('-t','--TSSregion'),type = 'integer',default = 50,
               help = 'The upstream and downstream region that a significantly enriched TSS 
                 can wobble. Default: 50.'),
@@ -48,10 +39,14 @@ option_list <- list(
                 can wobble. Default: 50.'),
   make_option(opt_str = c('-b','--bin'),type = 'integer',default = 5,
               help = 'An integer of unstream and downstream window size to aggregate the reads 
-                around a TSS/TES. The total reads in [site-bin,site+bin] will be calculated.'),
+                around a TSS/TES. The total reads in [site-bin,site+bin] will be calculated. 
+                Default: 5.'),
   make_option(opt_str = c('-r','--minreads'),type = 'integer',default = 2,
               help = 'The minimum reads in the window around TSS/TES to support high confident 
-                sites. Default: 2.')
+                sites. Default: 2.'),
+  make_option(opt_str = c('-f','--refRTD'),default = NULL,
+              help = 'Optional. A gtf file of reference transcript annotation, which is used as a SJ
+                database to support the SJs in iso-seq assembly. Default: NULL')
 )
 opt_parser <- OptionParser(option_list=option_list)
 # print_help(opt_parser)
@@ -76,6 +71,7 @@ TSS_region <- opt$TSSregion
 TES_region <- opt$TESregion
 bin <- opt$bin
 min_read <- opt$minreads
+ref_rtd <- opt$refRTD
 
 cat('data_dir =',data_dir,'\n')
 cat('genome_fasta =',genome_fasta,'\n')
@@ -86,11 +82,12 @@ cat('TSS_region =',TSS_region,'\n')
 cat('TES_region =',TES_region,'\n')
 cat('bin =',bin,'\n')
 cat('min_read =',min_read,'\n')
+cat('ref_rtd =',ref_rtd,'\n')
 
 ############################################
 ###---> SJ analysis
 SJanalysis(data_dir = data_dir,genome_fasta = genome_fasta,
-           sj_overhang = sj_overhang)
+           sj_overhang = sj_overhang,ref_rtd = ref_rtd)
 
 ###---> TSS/TES analysis
 TSanalysis(data_dir = data_dir,cut_off = cut_off,cut_at = cut_at,
