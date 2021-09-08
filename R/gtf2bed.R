@@ -17,14 +17,23 @@ gtf2bed <- function(gtf_file,bed_file=NULL){
   mapping <- mapping[!duplicated(mapping),]
   rownames(mapping) <- mapping$transcript_id
   
+  message('x <- split(exon,exon$transcript_id)')
   x <- split(exon,exon$transcript_id)
-  # bed <- rtracklayer::asBED(exon)
+  message('x_range <- range(x)')
   x_range <- range(x)
   if (any(elementNROWS(x_range) != 1L))
     stop("Empty or multi-strand/seqname elements not supported by BED")
+	
+  message('bed <- unlist(x_range, use.names=FALSE)')
   bed <- unlist(x_range, use.names=FALSE)
+  
+  message('mcols(bed) <- mcols(x)')
   mcols(bed) <- mcols(x)
+  
+  message('mcols(bed)$name <- names(x)')
   mcols(bed)$name <- names(x)
+  
+  message('x_ranges <- ranges(unlist(x, use.names=FALSE))')
   x_ranges <- ranges(unlist(x, use.names=FALSE))
   message('ord_start')
   ord_start <- order(IRanges::togroup(IRanges::PartitioningByEnd(x)), start(x_ranges))
