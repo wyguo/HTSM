@@ -17,7 +17,7 @@ gtf2bed <- function(gtf_file,bed_file=NULL){
   rownames(mapping) <- mapping$transcript_id
   
   exon <- split(exon,exon$transcript_id)
-  bed <- asBED(exon)
+  bed <- rtracklayer::asBED(exon)
   
   blocks <- bed$blocks
   bed$blocks <- NULL
