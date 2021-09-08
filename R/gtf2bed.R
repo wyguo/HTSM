@@ -6,7 +6,7 @@ gtf2bed <- function(gtf_file,bed_file=NULL){
   if(is.null(bed_file))
     bed_file <- gsub('.gtf','.bed',gtf_file)
   
-  gr <- import(file2read)
+  gr <- import(gtf_file)
   type <- ifelse('feature' %in% colnames(mcols(gr)),'feature','type')
   if(!(type %in% c('feature','type')))
     stop('The object does not have a "feature" or "type" column of exon labels')
