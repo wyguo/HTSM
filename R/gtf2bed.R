@@ -26,7 +26,9 @@ gtf2bed <- function(gtf_file,bed_file=NULL){
   mcols(bed) <- mcols(x)
   mcols(bed)$name <- names(x)
   x_ranges <- ranges(unlist(x, use.names=FALSE))
-  ord_start <- order(togroup(PartitioningByEnd(x)), start(x_ranges))
+  message('ord_start')
+  ord_start <- order(IRanges::togroup(IRanges::PartitioningByEnd(x)), start(x_ranges))
+  message('ord_start_finish')
   x_ranges <- shift(x_ranges, 1L - rep(start(bed), elementNROWS(x)))[ord_start]
   # mcols(bed)$blocks <- relist(x_ranges, x)
   blocks <- relist(x_ranges, x)
