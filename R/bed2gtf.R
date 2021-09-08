@@ -1,3 +1,7 @@
+#' Convert gtf file to bed12 file. 
+#' @param bed_file A bed file name to save.
+#' @param gtf_file A gtf file. 
+#' @return A gtf file will be saved to the directory. 
 bed2gtf <- function(bed_file,gtf_file = NULL){
   if(is.null(gtf_file))
     gtf_file <- gsub('.bed','.gtf',bed_file)

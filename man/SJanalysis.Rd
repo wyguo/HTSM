@@ -4,7 +4,7 @@
 \alias{SJanalysis}
 \title{Splice Junction (SJ) analysis}
 \usage{
-SJanalysis(data_dir, genome_fasta = NULL, sj_overhang = 10)
+SJanalysis(data_dir, genome_fasta = NULL, sj_overhang = 10, ref_rtd = NULL)
 }
 \arguments{
 \item{data_dir}{The data direcotory of TAMA output}
@@ -13,7 +13,10 @@ SJanalysis(data_dir, genome_fasta = NULL, sj_overhang = 10)
 provide the full path.}
 
 \item{sj_overhang}{An integer of SJ overhang. A SJ is filtered if it has mismatches at its left (-sj_overhang)
-or right (+sj_overhang) exonic regions.
+or right (+sj_overhang) exonic regions.}
+
+\item{ref_rtd}{An gtf file of reference transcript annotation. If a canonical SJ in the isoseq assembly has 
+a match in the reference transcript annotation, it will be kept even though it has mismatches in the overhangs.
 
 genome_fasta <- 'data/isoseq/Morex_V2_pseudomolecules_and_unplaced_scaffolds_ENA.fasta'}
 }
