@@ -3,6 +3,9 @@
 #' @param bed_file A bed file name to save.
 #' @return A bed file will be saved to the directory. 
 gtf2bed <- function(gtf_file,bed_file=NULL){
+  if(is.null(bed_file))
+    bed_file <- gsub('.gtf','.bed',gtf_file)
+  
   gr <- import(file2read)
   type <- ifelse('feature' %in% colnames(mcols(gr)),'feature','type')
   if(!(type %in% c('feature','type')))
