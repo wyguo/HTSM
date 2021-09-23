@@ -1,6 +1,6 @@
 #' Filter collasped transcript datasets
 #' @param data_dir Data directory
-RTDfilter <- function(data_dir){
+rtdFilter <- function(data_dir){
 
   message('|==>   Filter the transcript dataset (ca. 1min): ',Sys.time(),'   <==|')
   message('Step 1: Process SJ and TSS/TES filters')
@@ -56,7 +56,7 @@ RTDfilter <- function(data_dir){
   write.csv(s,file=file.path(data_dir,paste0(prefix,'_summary.csv')))
 
   message('Step 3: Export the final RTD')
-  # export_gtf(gr = rtd_gtf,file2save = file.path(data_dir,paste0(prefix,'.gtf')))
+  export_gtf(gr = rtd_gtf,file2save = file.path(data_dir,paste0(prefix,'.gtf')))
   export(object = rtd_bed,file.path(data_dir,paste0(prefix,'.bed')),format = 'bed')
 
   file2merge <- data.frame(file_name=file.path(normalizePath(data_dir,winslash = '/'),

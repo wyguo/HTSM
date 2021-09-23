@@ -95,5 +95,5 @@ TSanalysis(data_dir = data_dir,cut_off = cut_off,cut_at = cut_at,
            TES_region = TES_region,bin = bin)
 
 ###---> filter the RTD
-RTDfilter(data_dir = data_dir)
+rtdFilter(data_dir = data_dir)
 
