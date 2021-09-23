@@ -112,13 +112,11 @@ getTransRange <- function(exon){
   gr
 }
 
-
-
 cleanMcols <- function(gr){
   meta <- mcols(gr)
   type_id <- ifelse('type' %in% colnames(meta),'type','feature')
-  meta <- meta[,c('source',type_id,'score','phase','transcript_id','gene_id')]
-  colnames(meta)[2] <- 'type'
+  idx <- c(type_id,'transcript_id','gene_id')
+  meta <- meta[,idx]
   mcols(gr) <- meta
   gr
 }
