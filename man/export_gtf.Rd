@@ -8,7 +8,7 @@ export_gtf(
   gr,
   file2save,
   source.col = "source",
-  feature.col = "feature",
+  feature.col = ifelse("type" \%in\% colnames(mcols(gr)), "type", "feature"),
   score = ".",
   phase = ".",
   mandatory = c("gene_id", "transcript_id"),

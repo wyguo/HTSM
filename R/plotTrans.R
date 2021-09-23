@@ -1,75 +1,126 @@
 plotTrans <- function(gr,
-                      exon_color='darkblue',
+                      exon_color='dodgerblue3',
                       intron_color='black',
                       exon_width=5,
                       intron_width=0.6,
-                      num_ticks=10,
-                      zoom=NULL){
-  
-  data2plot <- as.data.frame(gr)
-  s <- data2plot$strand[1]
-  chr <- data2plot$seqnames[1]
-  gene <- data2plot$gene_id[1]
-  
-  trans <- sort(unique(data2plot$transcript_id))
-  y <- seq_along(trans)
-  names(y) <- trans
-  
-  gr_split <- split(gr,gr$transcript_id)
-  gr_range <- as.data.frame(unlist(range(gr_split)))
-  gr_range$transcript_id <- rownames(gr_range)
-  
-  ### exons
-  data2plot$y <- y[data2plot$transcript_id]
-  
-  ### introns
-  gr_range$y <- y[gr_range$transcript_id]
-  
-  ### add arrows
-  data2arrow <- split(data2plot,data2plot$transcript_id)
-  if(s=='+'){
-    data2arrow <- lapply(data2arrow, function(x){
-      x <- x[-1,]
-      data.frame(start=x$start-1,end=x$start,y=x$y)
-    })
-  } else if (s=='-'){
-    data2arrow <- lapply(data2arrow, function(x){
-      x <- x[-nrow(x),]
-      data.frame(start=x$end+1,end=x$end,y=x$y)
-    })
-  } else {
-    data2arrow <- NULL
+                      x_ticks=10,
+                      arrow_ticks=10,
+                      zoom=NULL,
+                      xlim=NULL,
+                      vline=F,
+                      vline_color='red',
+                      vline_width=0.3){
+  if(NROW(gr)==0){
+    g <- ggplot() + 
+      annotate("text", x = 4, y = 25, label = 'Empty') + 
+      theme_void()
+    return(g)
   }
-  data2arrow <- do.call(rbind,data2arrow)
   
-  data2y <- data.frame(label=data2plot$transcript_id,y=data2plot$y) 
-  data2y <- data2y[!duplicated(data2y),]
+  type <- ifelse('type' %in% colnames(mcols(gr)),'type','feature')
+  gr <- gr[mcols(gr)[,type]=='exon',]
   
-  data2x <- seq(from=min(data2plot$start),to=max(data2plot$end),length.out = num_ticks)
+  gr$transcript_id <- paste0(gr$gene_id,': ',gr$transcript_id)
+  
+  gr.list <- split(gr,gr$transcript_id)
+  gr.range <- range(gr.list)
+  
+  data2line <- unlist(gr.range)
+  data2line$transcript_id <- names(gr.list)
+  data2line <- as.data.frame(data2line)
+  
+  trans <- sort(unique(data2line$transcript_id))
+  trans.idx <- seq_along(trans)
+  names(trans.idx) <- trans
+  data2line$y <- trans.idx[data2line$transcript_id]
+  
+  exon2plot <- as.data.frame(gr)
+  exon2plot$y <- trans.idx[exon2plot$transcript_id]
+  
+  loci <- range(gr,ignore.strand=T)
+  arrow.idx <- IRanges(start=seq(start(loci),end(loci),length.out = arrow_ticks),width = 2)
+  
+  idx <- findOverlaps(arrow.idx,gr@ranges)
+  # data2arrow1 <- as.data.frame(arrow.idx[idx@from])
+  data2arrow1 <- as.data.frame(arrow.idx[idx@from])
+  data2arrow1$transcript_id <- gr$transcript_id[idx@to]
+  data2arrow1$y <- trans.idx[data2arrow1$transcript_id]
+  data2arrow1$strand <- as.character(strand(gr))[idx@to]
+  data2arrow1$color <- 'white'
+  data2arrow1$start[data2arrow1$strand=='-'] <- data2arrow1$start[data2arrow1$strand=='-']+2
+  
+  introns <- exon2intron(gr)
+  if(!(class(introns) == "GRanges")){
+    data2arrow <- data2arrow1
+  } else {
+    idx <- findOverlaps(arrow.idx,introns@ranges)
+    if(NROW(idx)==0){
+      data2arrow <- data2arrow1
+    } else {
+      data2arrow2 <- as.data.frame(arrow.idx[idx@from])
+      data2arrow2$transcript_id <- introns$transcript_id[idx@to]
+      data2arrow2$y <- trans.idx[data2arrow2$transcript_id]
+      data2arrow2$strand <- as.character(strand(introns))[idx@to]
+      data2arrow2$color <- 'black'
+      data2arrow2$start[data2arrow2$strand=='-'] <- data2arrow2$start[data2arrow2$strand=='-']+2
+      data2arrow <- rbind(data2arrow1,data2arrow2)
+    }
+  }
+  
+  if(is.null(xlim))
+    xlim <- c(min(data2line$start),max(data2line$end))
+  
+  data2x <- seq(from=xlim[1],to=xlim[2],length.out = x_ticks)
   data2x <- as.integer(data2x)
   
-  g <- ggplot(data2plot,aes(x=start,y=y,xend=end,yend=y))+
-    geom_segment(data = gr_range,aes(x=start,y=y,xend=end,yend=y),size=intron_width)+
-    geom_segment(data = data2arrow,aes(x=start,y=y,xend=end,yend=y),size=intron_width,
-                 arrow = arrow(length = unit(0.5,"strwidth", "A")),
-                 color=intron_color)+
-    geom_segment(data = data2plot, size = exon_width,color = exon_color)+
-    scale_y_continuous(breaks = data2y$y,labels = data2y$label)+
+  if(is.null(xlim))
+    xlim <- c(min(data2x),max(data2x))
+  
+  chr <- unique(as.character(seqnames(gr)))
+  chr <- paste0(chr,':',paste0(xlim,collapse = '-'))
+  
+  gene <- unique(gr$gene_id)
+  gene <- paste0(gene,collapse = ' | ')
+  
+  if(!is.null(zoom))
+    xlim <- NULL
+  
+  g <- ggplot(data = data2line,aes(x=start,xend=end,y=y,yend=y))+
+    geom_segment(data = data2line,aes(x=start,xend=end,y=y,yend=y),
+                 size=intron_width,color = intron_color)+
+    geom_segment(data = exon2plot,aes(x=start,xend=end,y=y,yend=y),
+                 size=exon_width,color = exon_color)+
+    geom_segment(data = data2arrow,aes(color=color),
+                 arrow = arrow(length = unit(0.5,"strwidth", "A")))+
+    scale_color_manual(values = c('white'='white','black' = intron_color))+
+    scale_y_continuous(breaks = data2line$y,labels = data2line$transcript_id)+
     scale_x_continuous(breaks = data2x,labels = data2x,position = "top",
                        expand = expansion(mult = c(0.02, 0.05)))+
     theme_bw()+
-    labs(title=paste0(chr,': ',gene,' (strand:',s,')'))+ 
-    coord_cartesian(ylim = c(min(data2y$y)-0.5,max(data2y$y)+0.5))+
+    labs(title=chr)+ 
+    coord_cartesian(xlim = xlim,ylim = c(min(data2line$y)-0.5,max(data2line$y)+0.5),
+                    expand = T)+
     theme(axis.title = element_blank(),
           panel.border = element_blank(), 
           panel.grid.major = element_blank(),
           panel.grid.minor = element_blank(), 
           axis.line.x = element_line(colour = "black"),
-          axis.ticks.y = element_blank())
+          axis.ticks.y = element_blank(),
+          legend.position = 'none')
+    # xlim(xlim)
+  
+  if(vline){
+    vl <- unique(c(start(gr),end(gr)))
+    g <- g + geom_vline(xintercept = vl,linetype='dashed',size=vline_width,color=vline_color)
+  }
+  
   
   # ggplotly(g)
+  # if(!is.null(xlim))
+  #   g <- g +  coord_cartesian(xlim = xlim)
   if(!is.null(zoom))
     g <- g + facet_zoom(xlim = zoom,zoom.size = 1)
+  
   g
 }
 
