@@ -2,7 +2,7 @@
 #' @param gtf_file A gtf file.
 #' @param bed_file A bed file name to save.
 #' @return A bed file will be saved to the directory.
-gtf2bed <- function(gtf_file,bed_file=NULL){
+gtf2bed <- function(gtf_file,bed_file=NULL,itemRgb="255,0,0"){
   if(is.null(bed_file))
     bed_file <- gsub('.gtf','.bed',gtf_file)
   message('Read gtf file ...')
@@ -44,7 +44,7 @@ gtf2bed <- function(gtf_file,bed_file=NULL){
                    strand = strand_info,
                    thickStart = start(bed) - 1,
                    thickEnd = end(bed),
-                   itemRgb = 1,
+                   itemRgb = itemRgb,
                    blockCount = elementNROWS(blocks),
                    blockSizes = unlist(lapply(width(blocks), paste, collapse = ","), use.names = FALSE),
                    blockStarts = unlist(lapply(start(blocks) - 1, paste, collapse = ","), use.names = FALSE))

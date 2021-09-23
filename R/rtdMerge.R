@@ -33,6 +33,25 @@ rtdMerge <- function(inf_file,
   ## load gtf files
   ref <- import(ref_file)
   inf <- import(inf_file)
+  
+  if(grepl(pattern = '[.]bed',inf_file)){
+    inf <- unlist(blocks(inf))
+    inf$gene_id <- gsub(';.*','',names(inf))
+    inf$transcript_id <- gsub('.*;','',names(inf))
+    inf$type <- 'exon'
+    names(inf) <- NULL
+    inf <- sort(inf,by=~seqnames + start + end)
+  }
+  
+  if(grepl(pattern = '[.]bed',ref_file)){
+    ref <- unlist(blocks(ref))
+    ref$gene_id <- gsub(';.*','',names(ref))
+    ref$transcript_id <- gsub('.*;','',names(ref))
+    ref$type <- 'exon'
+    names(ref) <- NULL
+    ref <- sort(ref,by=~seqnames + start + end)
+  }
+  
   ref <- cleanMcols(ref)
   inf <- cleanMcols(inf)
   

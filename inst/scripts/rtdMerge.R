@@ -7,9 +7,9 @@ suppressMessages(library("RTDBox"))
 
 option_list <- list(
   make_option(opt_str = c('-i','--inf'),
-              help = 'Input inference RTD gtf file.'),
+              help = 'Input inference RTD gtf or bed file. Format will be determined from the file extension.'),
   make_option(opt_str = c('-r','--ref'),
-              help = 'Input reference RTD gtf file.'),
+              help = 'Input reference RTD gtf or bed file. Format will be determined from the file extension.'),
   make_option(opt_str = c('-n','--preinf'),default = 'inf',
               help = 'Prefix to append to transcript ids from inference RTD. Default: inf'),
   make_option(opt_str = c('-m','--preref'),default = 'ref',

@@ -4,7 +4,7 @@
 \alias{gtf2bed}
 \title{Convert gtf file to bed12 file.}
 \usage{
-gtf2bed(gtf_file, bed_file = NULL)
+gtf2bed(gtf_file, bed_file = NULL, itemRgb = "255,0,0")
 }
 \arguments{
 \item{gtf_file}{A gtf file.}
