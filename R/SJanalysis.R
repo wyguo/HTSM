@@ -4,11 +4,11 @@
 #' provide the full path.
 #' @param sj_overhang An integer of SJ overhang. A SJ is filtered if it has mismatches at its left (-sj_overhang)
 #' or right (+sj_overhang) exonic regions.
-#' @param ref_rtd An gtf file of reference transcript annotation. If a canonical SJ in the isoseq assembly has 
-#' a match in the reference transcript annotation, it will be kept even though it has mismatches in the overhangs.
+#' @param sjdatabase A tab separated file of splice junction information. If a canonical SJ in the isoseq assembly has 
+#' a match in the database, it will be kept even though it has mismatches in the overhangs.
 #'
 #' genome_fasta <- 'data/isoseq/Morex_V2_pseudomolecules_and_unplaced_scaffolds_ENA.fasta'
-SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10,ref_rtd=NULL){
+SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10,sjdatabase=NULL){
   start.time <- Sys.time()
 
   if(is.null(genome_fasta))
@@ -169,15 +169,18 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10,ref_rtd=NUL
   #######################################################################
   canonical <- c("GTAG","GCAG","ATAC","CTAC","CTGC","GTAT")
   
-  ## ref_rtd
-  if(!is.null(ref_rtd)){
+  ## sjdatabase
+  if(!is.null(sjdatabase)){
     message('  Reading SJ database...')
-    gtf_db <- import(ref_rtd)
-    idx <- ifelse('type' %in% colnames(mcols(gtf_db)),'type','feature')
-    gtf_db <- gtf_db[mcols(gtf_db)[,idx]=='exon',]
-    intron_db <- exon2intron(gtf_db)
-    intron_db <- unique(intron_db$label)
-    rm(gtf_db)
+    sj <- read.table(sjdatabase, header=FALSE,sep = '\t',quote = "\"",dec='.',fill = T,comment.char = "")
+    sj <- sj[,1:4]
+    sj <- sj[!duplicated(sj),]
+    colnames(sj) <- c('seqnames','start','end','strand')
+    sj$strand[sj$strand==0] <- '*'
+    sj$strand[sj$strand==1] <- '+'
+    sj$strand[sj$strand==2] <- '-'
+    intron_db <- paste0(sj$seqnames,':',sj$start,'-',sj$end,';',sj$strand)
+    intron_db <- unique(intron_db)
   } else {
     intron_db <- NULL
   }
