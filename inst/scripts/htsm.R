@@ -4,7 +4,7 @@ suppressMessages(library("rtracklayer"))
 suppressMessages(library("GenomicRanges"))
 suppressMessages(library("Biostrings"))
 suppressMessages(library("tidyr"))
-suppressMessages(library("RTDBox"))
+suppressMessages(library("HTSM"))
 
 options(stringsAsFactors = F,scipen = 99)
 
