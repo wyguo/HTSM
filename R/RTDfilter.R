@@ -1,35 +1,44 @@
 #' Filter collasped transcript datasets
 #' @param data_dir Data directory
 rtdFilter <- function(data_dir){
-
-  message('|==>   Filter the transcript dataset (ca. 1min): ',Sys.time(),'   <==|')
-  message('Step 1: Process SJ and TSS/TES filters')
+  message('|==========> Apply SJ and TSS/TES filters: ',Sys.time(),' <==========|')
+  message('Step 1: Load intermediate datasets\n')
   start.time <- Sys.time()
+  
+  if(!file.exists(file.path(data_dir,'HC_TSS.RData')) |
+     !file.exists(file.path(data_dir,'HC_TES.RData')) |
+     !file.exists(file.path(data_dir,'trans_bed2filter.RData')) |
+     !file.exists(file.path(data_dir,'sj_filter.RData')) |
+     !file.exists(file.path(data_dir,'input_files.RData'))
+     )
+    stop('SJ and TSS/TES analysis must be conducted before RTD filter')
 
   load(file.path(data_dir,'HC_TSS.RData'))
   load(file.path(data_dir,'HC_TES.RData'))
-  load(file.path(data_dir,'collasped_bed.RData'))
-  load(file.path(data_dir,'sj_trans_filter.RData'))
-
-  if(!file.exists(file.path(data_dir,'HC_TSS.RData')) |
-     !file.exists(file.path(data_dir,'HC_TES.RData')) |
-     !file.exists(file.path(data_dir,'collasped_bed.RData')) |
-     !file.exists(file.path(data_dir,'sj_trans_filter.RData')))
-    stop('SJ and TSS/TES analysis must be conducted before RTD filter')
-
-  prefix <- list.files(path = data_dir,
-                       pattern = '_collasped.bed$',
-                       full.names = F,
-                       recursive = T)
-  prefix <- gsub('.bed','_filtered',prefix)
-
-  ## Get the labels of HC TSS and TES
+  load(file.path(data_dir,'trans_bed2filter.RData'))
+  load(file.path(data_dir,'sj_filter.RData'))
+  load(file.path(data_dir,'input_files.RData'))
+  
+  message('Step 2: Apply splice junction filter\n')
+  ##############################################################
+  ###---> filter transcripts with error splice junction
+  sj_filter <- unique(unlist(sj_filter))
+  
+  exons <- unlist(blocks(trans_bed2filter))
+  ## add gene and transcript ids
+  exons$gene_id <- gsub(';.*','',names(exons))
+  exons$transcript_id <- gsub('.*;','',names(exons))
+  names(exons) <- NULL
+  introns <- exon2intron(exons,sorted = F)
+  trans2filter <- unique(introns$transcript_id[introns$label %in% sj_filter])
+  
+  message('Step 3: Apply TSS and TES filter\n')
+  ##############################################################
+  ###---> filter transcripts with low quality TSS and TES
   TES_label <- unique(HC_TES$label)
   TSS_label <- unique(HC_TSS$label)
-
-  ## Get transcript from rtd
-  gr <- collasped_bed[collasped_bed$transcript_id %in% sj_trans_filter$trans_keep,]
-
+  gr <- trans_bed2filter[!(trans_bed2filter$transcript_id %in% trans2filter),]
+  
   ## Match labels of TSS
   gr_start <- resize(gr,fix = 'start',width = 1,ignore.strand=F)
   gr_start_label <- paste0(seqnames(gr_start),';',strand(gr_start),';',start(gr_start))
@@ -41,22 +50,13 @@ rtdFilter <- function(data_dir){
   trans_end <- gr_end$transcript_id[gr_end_label %in% TES_label]
 
   ## Subset rtd with HC transcripts
-  trans <- unique(intersect(trans_start,trans_end))
+  trans <- intersect(trans_start,trans_end)
   rtd_bed <- gr[gr$transcript_id %in% trans,]
-
-  ## get exons of the transcriptome
-  rtd_gtf <- unlist(blocks(rtd_bed))
-  rtd_gtf$gene_id <- gsub(';.*','',names(rtd_gtf))
-  rtd_gtf$transcript_id <- gsub('.*;','',names(rtd_gtf))
-  rtd_gtf$feature <- 'exon'
-  rtd_gtf <- sort(rtd_gtf,by=~seqnames + start + end)
-
-  message('Step 2: Summarise the final RTD')
-  s <- rtdSummary(rtd_gtf)
-  write.csv(s,file=file.path(data_dir,paste0(prefix,'_summary.csv')))
-
-  message('Step 3: Export the final RTD')
-  # export_gtf(gr = rtd_gtf,file2save = file.path(data_dir,paste0(prefix,'.gtf')))
+  
+  message('Step 4: Save the filtered RTD\n')
+  file2save <- input_files$trans_merged[1]
+  
+  prefix <- paste0(gsub('.bed','',basename(file2save)),'_filtered')
   export(object = rtd_bed,file.path(data_dir,paste0(prefix,'.bed')),format = 'bed')
 
   file2merge <- data.frame(file_name=file.path(normalizePath(data_dir,winslash = '/'),
@@ -65,17 +65,10 @@ rtdFilter <- function(data_dir){
                            merge_priority='1,1,1',
                            source_name=prefix)
 
-  write.table(file2merge, file = file.path(data_dir,'file2merge.txt'),
+  write.table(file2merge, file = file.path(data_dir,'tama_merge_final_rtd_file.txt'),
               sep = "\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
   ##########################################################################
-  rm(collasped_bed)
-  rm(gr)
-  rm(gr_start)
-  rm(gr_end)
-  rm(rtd_bed)
-  rm(rtd_gtf)
-  gc()
 
   end.time <- Sys.time()
   time.taken <- end.time - start.time

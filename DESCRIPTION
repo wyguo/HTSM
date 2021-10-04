@@ -1,6 +1,6 @@
-Package: RTDBox
+Package: HTSM
 Type: Package
-Title: Reference transcript dataset (RTD) construction and refine
+Title: High resolution Transcriptome using Single Molecule PacBio Iso-seq data
 Version: 0.1.0
 Author: Wenbin Guo
 Maintainer: The package maintainer <wenbin.guo@hutton.ac.uk>

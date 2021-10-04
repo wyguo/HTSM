@@ -1,12 +1,12 @@
-## RTDBox-isoseq
+## High resolution Transcriptome using Single Molecule PacBio Iso-seq data (HTSM)
 
 Install packages
 ----------------
 
 ```
-###---> Install RTDBox
+###---> Install HTSM
 install.packages('devtools') ## if not installed
-devtools::install_github("wyguo/RTDBox")
+devtools::install_github("wyguo/HTSM")
 
 ###---> packages of dependencies
 bioconductor.package.list <- c('rtracklayer','GenomicRanges','GenomicRanges','Biostrings')
@@ -30,7 +30,7 @@ The following files are mandatory for the analysis
       + prefix_local_density_error.txt
       + prefix_collasped_trans_read.bed
       + prefix_collasped.bed
-      + prefix__polya.txt
+      + prefix_polya.txt
 
 Output data
 -----------
@@ -56,7 +56,7 @@ Run pipeline with R code
 ------------------------
 
 ```
-library("RTDBox")
+library("HTSM")
 library("rtracklayer")
 library("GenomicRanges")
 library("Biostrings")
@@ -106,10 +106,10 @@ TES_region=50
 bin=5
 
 ## help
-# Rscript /mnt/shared/scratch/wguo/apps/conda/envs/isoseq/lib/R/library/RTDBox/scripts/isofilter.R --help
-# Note: isofilter.R is in the scripts folder where you installed the RTDBox package
+# Rscript /mnt/shared/scratch/wguo/apps/conda/envs/isoseq/lib/R/library/HTSM/scripts/isofilter.R --help
+# Note: isofilter.R is in the scripts folder where you installed the HTSM package
 
-Rscript /mnt/shared/scratch/wguo/apps/conda/envs/isoseq/lib/R/library/RTDBox/scripts/isofilter.R \
+Rscript /mnt/shared/scratch/wguo/apps/conda/envs/isoseq/lib/R/library/HTSM/scripts/isofilter.R \
 -d $data_dir \
 -g $genome_fasta \
 -s $sj_overhang \
