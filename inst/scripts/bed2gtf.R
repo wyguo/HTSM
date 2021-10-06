@@ -2,7 +2,7 @@
 message('Loading R packages ... ')
 suppressMessages(library("optparse"))
 suppressMessages(library("rtracklayer"))
-suppressMessages(library("RTDBox"))
+suppressMessages(library("HTSM"))
 
 # sourceDir <- function(path, trace = TRUE, ...) {
 #   for (nm in list.files(path, pattern = '*.R')) {

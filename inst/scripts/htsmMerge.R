@@ -3,7 +3,7 @@ suppressMessages(library("optparse"))
 suppressMessages(library("GenomicRanges"))
 suppressMessages(library("rtracklayer"))
 suppressMessages(library("ggplot2"))
-suppressMessages(library("RTDBox"))
+suppressMessages(library("HTSM"))
 
 option_list <- list(
   make_option(opt_str = c('-i','--inf'),

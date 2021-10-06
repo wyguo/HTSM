@@ -3,7 +3,7 @@ message('Loading R packages ... ')
 suppressMessages(library("optparse"))
 suppressMessages(library("GenomicRanges"))
 suppressMessages(library("rtracklayer"))
-suppressMessages(library("RTDBox"))
+suppressMessages(library("HTSM"))
 
 option_list <- list(
   make_option(opt_str = c('-i','--input'),help = 'Input bed or gtf file'),
