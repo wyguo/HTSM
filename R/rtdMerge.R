@@ -206,8 +206,8 @@ rtdMerge <- function(inf_file,
   transpergene <- data.frame(TransPerGene=rownames(transpergene),transpergene,row.names = NULL)
   colnames(transpergene) <- c('TransPerGene',prefix_ref,prefix_inf,'merged')
   write.csv(transpergene,
-            file=file.path(data_dir,paste0(prefix_ref,'_and_', prefix_inf,
-                                           '_merged_rtd_transcript_per_gene_number.csv')),
+            file=file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_', prefix_inf,
+                                           '_transcript_per_gene_number.csv')),
             row.names = F)
   
   data2plot <- rbind(
@@ -226,11 +226,13 @@ rtdMerge <- function(inf_file,
     labs(title = 'Transcript number per gene',x='Transcripts in a gene',y='Genen number')+
     coord_cartesian(ylim = c(0,max(data2plot$Number)*1.1))
   
-  png(file.path(data_dir,paste0(prefix_ref,'_and_',prefix_inf,'_merged_rtd_transcript_per_gen.png')),width = 11,height = 5,res = 300,units = 'in')
+  png(file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_',prefix_inf,'_transcript_per_gene_number.png')),
+      width = 11,height = 5,res = 300,units = 'in')
   print(g)
   dev.off()
   
-  pdf(file.path(data_dir,paste0(prefix_ref,'_and_',prefix_inf,'_merged_rtd_transcript_per_gen.pdf')),width = 11,height = 5)
+  pdf(file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_',prefix_inf,'_transcript_per_gene_number.pdf')),
+      width = 11,height = 5)
   print(g)
   dev.off()
   
@@ -241,13 +243,13 @@ rtdMerge <- function(inf_file,
   stat <- cbind(stat_ref,stat_inf,stat_merged)
   colnames(stat) <- c(prefix_ref,prefix_inf,'merged')
   
-  write.csv(stat,file=file.path(data_dir,paste0(prefix_ref,'_and_', prefix_inf,'_merged_rtd_summary.csv')))
+  write.csv(stat,file=file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_', prefix_inf,'_merged_summary.csv')))
   message('Step 5: Save the results')
   
   export_gtf(gr = rtd,
-             file2save = file.path(data_dir,paste0(prefix_ref,'_and_', prefix_inf,'_merged_rtd.gtf')))
-  save(rtd,file = file.path(data_dir,paste0(prefix_ref,'_and_', prefix_inf,'_merged_rtd.RData')))
-  save(inf_trans_list,file=file.path(data_dir,'inf_trans_list.RData'))
+             file2save = file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_', prefix_inf,'_merged.gtf')))
+  save(rtd,file = file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_', prefix_inf,'_merged.RData')))
+  save(inf_trans_list,file=file.path(data_dir,paste0(prefix_inf,'_trans_summary.RData')))
   
   #######################
   ###---> save to bed file
@@ -279,7 +281,7 @@ rtdMerge <- function(inf_file,
   rownames(df) <- NULL
   
   message('Export bed file ...')
-  write.table(df, file = file.path(data_dir,paste0(prefix_ref,'_and_', prefix_inf,'_merged_rtd.bed')), 
+  write.table(df, file = file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_', prefix_inf,'_merged.bed')), 
               sep = "\t", col.names = FALSE,
               row.names = FALSE, quote = FALSE, na = ".")
   
