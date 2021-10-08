@@ -6,8 +6,8 @@
 #' or right (+sj_overhang) exonic regions.
 #' @param sjdatabase A tab separated file of splice junction information. If a canonical SJ in the isoseq assembly has 
 #' a match in the database, it will be kept even though it has mismatches in the overhangs.
-#'
-#' genome_fasta <- 'data/isoseq/Morex_V2_pseudomolecules_and_unplaced_scaffolds_ENA.fasta'
+#' @return Results are saved in \code{data_di}
+#' 
 SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10,sjdatabase=NULL){
   start.time <- Sys.time()
   message('|==========> Splice junction analysis: ',Sys.time(),' <==========|')
@@ -94,6 +94,8 @@ SJanalysis <- function(data_dir,genome_fasta = NULL,sj_overhang = 10,sjdatabase=
   ###---> sj database
   ## sjdatabase
   if(!is.null(sjdatabase)){
+    if(!file.exists(sjdatabase))
+      stop("The sj database file does not exist in the data direcotry.")
     message('  ->Reading SJ database: ',basename(sjdatabase),'\n')
     sj <- read.table(sjdatabase, header=FALSE,sep = '\t',quote = "\"",dec='.',fill = T,comment.char = "")
     sj <- sj[,1:4]

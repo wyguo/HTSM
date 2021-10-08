@@ -1,13 +1,15 @@
 #' Merge inference RTD to reference RTD
-#' @inf_file The gtf file of a inference RTD,e.g. a RTD assembled from short reads
-#' @ref_file The gtf file of a high confident reference RTD, e.g. a RTD assembled from long reads. The transcripts of the 
+#' @param inf_file The gtf file of a inference RTD,e.g. a RTD assembled from short reads
+#' @param ref_file The gtf file of a high confident reference RTD, e.g. a RTD assembled from long reads. 
+#' The transcripts of the 
 #' reference RTD will be all kept in the final results.
-#' @prefix_ref A prefix attached to the gene and transcript ids to distinguish their origin of "ref" RTD. 
+#' @param prefix_ref A prefix attached to the gene and transcript ids to distinguish their origin of "ref" RTD. 
 #' Default: "ref"
-#' @prefix_inf A prefix attached to the gene and transcript ids to distinguish their origin of "inf" RTD. 
+#' @param prefix_inf A prefix attached to the gene and transcript ids to distinguish their origin of "inf" RTD. 
 #' Default: "inf"
-#' @chimeric_tolerance If the loci overlap of two genes < chimeric_tolerance, they are treated as two seperate gene models.
-#' @data_dir The directory to save the results
+#' @param chimeric_tolerance Chimeric gene overlap percent, default: 0.05. 
+#' If the overlap of two gene models < x%, they are treated as separated gene models.  
+#' @param data_dir The directory to save the results
 #' @return A merged RTD saved in the \code{data_di}
 #' @example 
 #' data_dir <- 'data/Morex_V3'
@@ -210,31 +212,66 @@ rtdMerge <- function(inf_file,
                                            '_transcript_per_gene_number.csv')),
             row.names = F)
   
-  data2plot <- rbind(
-    data.frame(TransPerGene=transpergene[,1],Number=transpergene[,2],RTDs=colnames(transpergene)[2]),
-    data.frame(TransPerGene=transpergene[,1],Number=transpergene[,3],RTDs=colnames(transpergene)[3]),
-    data.frame(TransPerGene=transpergene[,1],Number=transpergene[,4],RTDs=colnames(transpergene)[4])
-  )
-  data2plot$TransPerGene <- factor(data2plot$TransPerGene,levels = transpergene$TransPerGene)
-  data2plot$RTDs <- factor(data2plot$RTDs,levels = c(prefix_ref,prefix_inf,'merged'))
+  data2plot <- transpergene[,-1]
+  rownames(data2plot) <- transpergene[,1]
+  data2plot <- t(data2plot)
   
-  g <- ggplot(data2plot,aes(x=TransPerGene,y=Number,fill=RTDs))+
-    geom_bar(stat='identity',position = position_dodge())+
-    geom_text(aes(label = Number,color=RTDs),position = position_dodge(width = 1),
-              hjust = -0.2,angle=90,size=2.5)+
-    theme_bw()+
-    labs(title = 'Transcript number per gene',x='Transcripts in a gene',y='Genen number')+
-    coord_cartesian(ylim = c(0,max(data2plot$Number)*1.1))
+  png(file.path(data_dir,
+                paste0('htsm_rtd_',prefix_ref,'_',prefix_inf,'_transcript_per_gene_number.png')),
+      width = 10,height = 5,res = 300,units = 'in')
+  xx <- barplot(data2plot,beside = TRUE,col =  c("#999999", "#E69F00", "#56B4E9"),
+                ylim=c(0,1.2*max(data2plot)),
+                xlab = 'Transcripts in a gene',
+                ylab = 'Genen number',
+                main='Transcript number per gene',
+                space=c(0,0.5))
   
-  png(file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_',prefix_inf,'_transcript_per_gene_number.png')),
-      width = 11,height = 5,res = 300,units = 'in')
-  print(g)
+  ## Add text at top of bars
+  text(x = xx, y = data2plot, label = data2plot, cex = 0.7, col = "red",
+       srt=-90,adj=c(1.1,0.5))
   dev.off()
   
-  pdf(file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_',prefix_inf,'_transcript_per_gene_number.pdf')),
-      width = 11,height = 5)
-  print(g)
+  
+  pdf(file.path(data_dir,
+                paste0('htsm_rtd_',prefix_ref,'_',prefix_inf,'_transcript_per_gene_number.pdf')),
+      width = 10,height = 5)
+  xx <- barplot(data2plot,beside = TRUE,col =  c("#999999", "#E69F00", "#56B4E9"),
+                ylim=c(0,1.2*max(data2plot)),
+                xlab = 'Transcripts in a gene',
+                ylab = 'Genen number',
+                main='Transcript number per gene',
+                space=c(0,0.5))
+  
+  ## Add text at top of bars
+  text(x = xx, y = data2plot, label = data2plot, cex = 0.7, col = "red",
+       srt=-90,adj=c(1.1,0.5))
   dev.off()
+  
+  # data2plot <- rbind(
+  #   data.frame(TransPerGene=transpergene[,1],Number=transpergene[,2],RTDs=colnames(transpergene)[2]),
+  #   data.frame(TransPerGene=transpergene[,1],Number=transpergene[,3],RTDs=colnames(transpergene)[3]),
+  #   data.frame(TransPerGene=transpergene[,1],Number=transpergene[,4],RTDs=colnames(transpergene)[4])
+  # )
+  # data2plot$TransPerGene <- factor(data2plot$TransPerGene,levels = transpergene$TransPerGene)
+  # data2plot$RTDs <- factor(data2plot$RTDs,levels = c(prefix_ref,prefix_inf,'merged'))
+  # 
+  # g <- ggplot(data2plot,aes(x=TransPerGene,y=Number,fill=RTDs))+
+  #   geom_bar(stat='identity',position = position_dodge())+
+  #   geom_text(aes(label = Number,color=RTDs),position = position_dodge(width = 1),
+  #             hjust = -0.2,angle=90,size=2.5)+
+  #   theme_bw()+
+  #   labs(title = 'Transcript number per gene',x='Transcripts in a gene',y='Genen number')+
+  #   coord_cartesian(ylim = c(0,max(data2plot$Number)*1.1))
+  # 
+  # png(file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_',prefix_inf,'_transcript_per_gene_number.png')),
+  #     width = 11,height = 5,res = 300,units = 'in')
+  # print(g)
+  # dev.off()
+  # 
+  # pdf(file.path(data_dir,paste0('htsm_rtd_',prefix_ref,'_',prefix_inf,'_transcript_per_gene_number.pdf')),
+  #     width = 11,height = 5)
+  # print(g)
+  # dev.off()
   
   ###---> basic statistics
   stat_merged <- rtdSummary(gr = rtd)

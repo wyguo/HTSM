@@ -1,5 +1,7 @@
 #' Filter collasped transcript datasets
 #' @param data_dir Data directory
+#' @return Results are saved in \code{data_di}
+#' 
 rtdFilter <- function(data_dir){
   message('|==========> Apply SJ and TSS/TES filters: ',Sys.time(),' <==========|')
   message('Step 1: Load intermediate datasets\n')

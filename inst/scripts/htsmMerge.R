@@ -2,7 +2,6 @@ message('Loading R packages ... ')
 suppressMessages(library("optparse"))
 suppressMessages(library("GenomicRanges"))
 suppressMessages(library("rtracklayer"))
-suppressMessages(library("ggplot2"))
 suppressMessages(library("HTSM"))
 
 option_list <- list(
@@ -48,8 +47,15 @@ if(is.null(opt$ref)){
 
 inf_file <- opt$inf
 ref_file <- opt$ref
+
 prefix_ref <- opt$preref
+if(is.null(prefix_ref))
+  prefix_ref <- 'htms'
+
 prefix_inf <- opt$preinf
+if(is.null(prefix_inf))
+  prefix_inf <- 'rtd'
+
 chimeric_tolerance <- opt$chimeric
 
 

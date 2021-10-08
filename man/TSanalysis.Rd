@@ -29,6 +29,9 @@ site+/-site_region are all treated as high confident sites. Default: 50.}
 \item{bin}{An integer of window size to aggregate the reads upstream and downstream a TSS/TES.
 The total reads in [site-bin,site+bin] will be calculated. Default: 5.}
 }
+\value{
+Results are saved in \code{data_di}
+}
 \description{
 Transcript start site (TSS) and end site (TES) analysis
 }

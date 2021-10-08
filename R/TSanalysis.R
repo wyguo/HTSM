@@ -7,6 +7,8 @@
 #' @param min_read The minimum reads in the window around TSS/TES to support high confident sites. Default: 2.
 #' @param bin An integer of window size to aggregate the reads upstream and downstream a TSS/TES.
 #' The total reads in [site-bin,site+bin] will be calculated. Default: 5.
+#' @return Results are saved in \code{data_di}
+#' 
 
 TSanalysis <- function(data_dir,cut_off = 0.05,cut_at = 'fdr',
                        TSS_region = 50,TES_region = 50,min_read = 2,bin = 5){

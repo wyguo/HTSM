@@ -13,6 +13,24 @@ rtdMerge(
   data_dir
 )
 }
+\arguments{
+\item{inf_file}{The gtf file of a inference RTD,e.g. a RTD assembled from short reads}
+
+\item{ref_file}{The gtf file of a high confident reference RTD, e.g. a RTD assembled from long reads. 
+The transcripts of the 
+reference RTD will be all kept in the final results.}
+
+\item{prefix_ref}{A prefix attached to the gene and transcript ids to distinguish their origin of "ref" RTD. 
+Default: "ref"}
+
+\item{prefix_inf}{A prefix attached to the gene and transcript ids to distinguish their origin of "inf" RTD. 
+Default: "inf"}
+
+\item{chimeric_tolerance}{Chimeric gene overlap percent, default: 0.05. 
+If the overlap of two gene models < x%, they are treated as separated gene models.}
+
+\item{data_dir}{The directory to save the results}
+}
 \value{
 A merged RTD saved in the \code{data_di}
 }
